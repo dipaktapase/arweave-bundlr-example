@@ -32,6 +32,28 @@ export default function Home() {
     }
   }
 
+  async function uploadFile() {    
+    let tx = await bundlrInstance.uploader.upload(file, [{ name: "Content-Type", value: "image/png" }])
+    console.log('tx: ', tx)
+    setURI(`http://arweave.net/${tx.data.id}`)
+
+  }
+
+  function onFileChange(e) {
+    const file = e.target.files[0]
+    if (file) {
+      const image = URL.createObjectURL(file)
+      setImage(image)
+      let reader = new FileReader()
+      reader.onload = function () {
+        if (reader.result) {
+          setFile(Buffer.from(reader.result))
+        }
+      }  
+      reader.readAsArrayBuffer(file)
+    }
+  }
+
   return (
     <div style={containerStyle}>
       {
@@ -47,7 +69,14 @@ export default function Home() {
                 onChange={e => setAmount(e.target.value)} />
               <button onClick={fundWallet}>Fund Wallet</button>
             </div>
-
+            <input type='file' onChange={onFileChange} />
+            <button onClick={uploadFile}>Upload File</button>
+            {
+              image && <img src={image} style={{ width: '500px' }}/>
+            }
+            {
+              URI && <a href={URI}>{URI}</a>
+            }
           </div>
         )
       }
